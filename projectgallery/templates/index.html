@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SnapDrop</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      background-size: 800% 800%;
+      animation: animatedBackground 20s ease infinite;
+      position: relative;
+    }
+
+    @keyframes animatedBackground {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .particles {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .particles span {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      filter: blur(4px);
+      animation: moveUp 12s linear infinite;
+    }
+
+    @keyframes moveUp {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 0.9; }
+      100% { transform: translateY(-10vh) scale(1.4); opacity: 0; }
+    }
+
+    .intro-text {
+      position: absolute;
+      top: 10%;
+      width: 100%;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 20px #000;
+      opacity: 0;
+      transform: scale(0.8);
+      animation: fadeZoomIn 3s ease-out forwards;
+      z-index: 3;
+    }
+
+    @keyframes fadeZoomIn {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 35px 50px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      max-width: 650px;
+      width: 100%;
+      text-align: center;
+      animation: popIn 0.5s ease forwards;
+      transform: scale(0.95);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      z-index: 2;
+    }
+
+    .container:hover {
+      transform: scale(1.03);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #4b6cb7, #182848);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 2.2rem;
+    }
+
+    p {
+      margin-bottom: 25px;
+      font-size: 1.1rem;
+      color: #444;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .file-input {
+      position: relative;
+      display: inline-block;
+    }
+
+    .file-input input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-label {
+      padding: 12px 26px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      transition: all 0.4s ease;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      cursor: pointer;
+    }
+
+    .file-label:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    button {
+      padding: 12px 28px;
+      background: linear-gradient(to right, #36d1dc, #5b86e5);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      box-shadow: 0 6px 18px rgba(91, 134, 229, 0.5);
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 30px rgba(91, 134, 229, 0.7);
+    }
+
+    .preview {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .preview img, .preview video {
+      width: 110px;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 25px 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      .preview img, .preview video {
+        width: 90px;
+        height: 90px;
+      }
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      width: 70px;
+      height: auto;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+
+<body>
+<header class="site-header">
+  <img src="{{ url_for('static', filename='logo.png') }}" class="logo" alt="SnapDrop Logo">
+</header>
+
+<div class="intro-text">PRESENTING: SNAPDROP</div>
+
+<div class="particles">
+  <span style="left: 10%; animation-delay: 0s;"></span>
+  <span style="left: 20%; animation-delay: 1s;"></span>
+  <span style="left: 30%; animation-delay: 2s;"></span>
+  <span style="left: 40%; animation-delay: 3s;"></span>
+  <span style="left: 50%; animation-delay: 4s;"></span>
+  <span style="left: 60%; animation-delay: 2s;"></span>
+  <span style="left: 70%; animation-delay: 1s;"></span>
+  <span style="left: 80%; animation-delay: 3s;"></span>
+  <span style="left: 90%; animation-delay: 4s;"></span>
+  <span style="left: 95%; animation-delay: 5s;"></span>
+</div>
+
+<div class="container">
+  <h1>SnapDrop</h1>
+  <p>Pick. Preview. Drop your Snaps.</p>
+
+  <form id="photoForm" action="/upload" method="post" enctype="multipart/form-data">
+    <div class="file-input">
+      <label for="photoInput" class="file-label">Choose Photos</label>
+      <input type="file" name="photos" id="photoInput" multiple accept="image/*,video/*">
+    </div>
+    <button type="submit">Upload All Photos</button>
+  </form>
+
+  <div class="preview" id="preview"></div>
+</div>
+
+<script>
+  const photoInput = document.getElementById('photoInput');
+  const previewContainer = document.getElementById('preview');
+
+  photoInput.addEventListener('change', () => {
+    previewContainer.innerHTML = '';
+    const files = photoInput.files;
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (file.type.startsWith('video')) {
+          const video = document.createElement('video');
+          video.src = e.target.result;
+          video.controls = true;
+          previewContainer.appendChild(video);
+        } else {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          previewContainer.appendChild(img);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+</script>
+</body>
+</html>

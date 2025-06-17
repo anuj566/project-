@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SnapDrop Gallery</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      background-size: 800% 800%;
+      animation: animatedBackground 20s ease infinite;
+      overflow-x: hidden;
+      position: relative;
+      padding: 80px 20px 40px;
+    }
+
+    @keyframes animatedBackground {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .particles {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .particles span {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      filter: blur(4px);
+      animation: moveUp 12s linear infinite;
+    }
+
+    @keyframes moveUp {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 0.9; }
+      100% { transform: translateY(-10vh) scale(1.4); opacity: 0; }
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      font-size: 3rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 15px rgba(0,0,0,0.6);
+      z-index: 2;
+      position: relative;
+    }
+
+    .gallery-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .photo-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      max-width: 300px;
+    }
+
+    .photo-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .photo-card {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🌟 Animated Particles -->
+  <div class="particles">
+    <span style="left: 10%; animation-delay: 0s;"></span>
+    <span style="left: 20%; animation-delay: 1s;"></span>
+    <span style="left: 30%; animation-delay: 2s;"></span>
+    <span style="left: 40%; animation-delay: 3s;"></span>
+    <span style="left: 50%; animation-delay: 4s;"></span>
+    <span style="left: 60%; animation-delay: 2s;"></span>
+    <span style="left: 70%; animation-delay: 1s;"></span>
+    <span style="left: 80%; animation-delay: 3s;"></span>
+    <span style="left: 90%; animation-delay: 4s;"></span>
+    <span style="left: 95%; animation-delay: 5s;"></span>
+  </div>
+
+  <!-- 🎨 Title -->
+  <h1>Uploaded Photos</h1>
+
+  <!-- 📸 Gallery Grid -->
+  <div class="gallery-container">
+    {% for photo in photos %}
+  <div class="photo-card">
+    {% if photo.endswith('.mp4') or photo.endswith('.webm') or photo.endswith('.mov') or photo.endswith('.avi') %}
+      <video src="{{ photo }}" controls style="width:100%; border-radius:10px;"></video>
+    {% else %}
+      <img src="{{ photo }}" alt="Uploaded Photo">
+    {% endif %}
+  </div>
+{% endfor %}
+
+  </div>
+
+</body>
+</html>
