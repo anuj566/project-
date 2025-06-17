@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anonymous Confession Wall - Home</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+<audio id="likeSound" src="like.mp3" preload="auto"></audio>
+
+<div id="particles-js"></div>
+<canvas id="particle-bg"></canvas>
+
+<header>
+  <nav class="navbar">
+    <h1 style="color: #ff66cc;">🕵️‍♂️ Anonymous Confession Wall</h1>
+    <ul class="nav-links">
+      <li><a href="#" id="homeBtn" class="active">Home</a></li>
+      <li><a href="confess.html">Confess</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="motivational">
+    <span>💙 You are not alone</span>
+    <span>📝 Your words have value</span>
+    <span>🤝 No one is going to judge you</span>
+  </div>
+
+  <div id="confessionsContainer"></div>
+</div>
+
+<script>
+  // Particle background
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 80 },
+      color: { value: "#ffffff" },
+      shape: { type: "circle" },
+      opacity: { value: 0.1 },
+      size: { value: 3 },
+      move: { enable: true, speed: 0.6 }
+    },
+    interactivity: {
+      events: { onhover: { enable: true, mode: "repulse" } }
+    }
+  });
+
+  // Starfield canvas
+  const canvas = document.getElementById('particle-bg');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const stars = [];
+  for (let i = 0; i < 100; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.5,
+      d: Math.random() * 0.5 + 0.2
+    });
+  }
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#888';
+    stars.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+  function moveStars() {
+    stars.forEach(s => {
+      s.y += s.d;
+      if (s.y > canvas.height) {
+        s.y = 0;
+        s.x = Math.random() * canvas.width;
+      }
+    });
+  }
+  function loop() {
+    drawStars();
+    moveStars();
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  // Fade-in animation fix for short pages
+  function checkFadeInElements() {
+    document.querySelectorAll(".fade-in").forEach((el) => {
+      const top = el.getBoundingClientRect().top;
+      if (top < window.innerHeight - 100) {
+        el.classList.add("visible");
+      }
+    });
+  }
+
+  window.addEventListener("scroll", checkFadeInElements);
+  window.addEventListener("load", checkFadeInElements);
+
+  // Render Confessions
+  function renderConfessions() {
+    const container = document.getElementById("confessionsContainer");
+    container.innerHTML = "";
+
+    const stored = localStorage.getItem("confessions");
+    if (!stored) {
+      container.innerHTML = `<div class="no-confessions">Be the first to confess!</div>`;
+      return;
+    }
+
+    const confessions = JSON.parse(stored);
+    if (confessions.length === 0) {
+      container.innerHTML = `<div class="no-confessions">Be the first to confess!</div>`;
+      return;
+    }
+
+    confessions.forEach((confession, index) => {
+      const post = document.createElement("div");
+      post.className = "confession-card fade-in";
+      post.innerHTML = `
+        <p>${confession.text}</p>
+        <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button onclick="likePost(this, ${index})">❤️ Like (<span class="like-count">${confession.likes}</span>)</button>
+          <button onclick="toggleCommentBox(this)">💬 Comment (<span class="comment-count">${confession.comments.length}</span>)</button>
+          <button onclick="deleteConfession(${index})" style="background-color: #ff4444;">🗑️ Delete</button>
+        </div>
+        <div class="comment-box" style="display:none; margin-top: 10px;">
+  <textarea class="styled-comment" placeholder="Write a comment..."></textarea>
+  <button class="styled-comment-btn" onclick="addComment(this, ${index})">Post Comment</button>
+  <div class="comments-list">
+    ${confession.comments.map(c => `<div class="comment">${c}</div>`).join("")}
+  </div>
+</div>
+
+      `;
+      container.appendChild(post);
+    });
+
+    // ✅ Trigger visibility check immediately after rendering
+    checkFadeInElements();
+  }
+
+  function likePost(button, index) {
+    document.getElementById("likeSound").play();
+    button.classList.add("liked");
+    setTimeout(() => button.classList.remove("liked"), 300);
+    const stored = JSON.parse(localStorage.getItem("confessions"));
+    stored[index].likes++;
+    localStorage.setItem("confessions", JSON.stringify(stored));
+    button.querySelector(".like-count").textContent = stored[index].likes;
+  }
+
+  function toggleCommentBox(button) {
+    const commentBox = button.parentElement.nextElementSibling;
+    commentBox.style.display = commentBox.style.display === "block" ? "none" : "block";
+  }
+
+  function addComment(btn, index) {
+    const commentBox = btn.parentElement;
+    const textarea = commentBox.querySelector("textarea");
+    const commentText = textarea.value.trim();
+    if (!commentText) return;
+    const stored = JSON.parse(localStorage.getItem("confessions"));
+    stored[index].comments.push(commentText);
+    localStorage.setItem("confessions", JSON.stringify(stored));
+    const commentDiv = document.createElement("div");
+    commentDiv.className = "comment";
+    commentDiv.textContent = commentText;
+    commentBox.querySelector(".comments-list").appendChild(commentDiv);
+    const commentCount = btn.closest(".confession-card").querySelector(".comment-count");
+    commentCount.textContent = stored[index].comments.length;
+    textarea.value = "";
+  }
+
+  function deleteConfession(index) {
+    const stored = JSON.parse(localStorage.getItem("confessions"));
+    stored.splice(index, 1);
+    localStorage.setItem("confessions", JSON.stringify(stored));
+    renderConfessions();
+  }
+
+  renderConfessions();
+</script>
+</body>
+</html>

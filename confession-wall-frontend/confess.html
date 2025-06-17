@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Anonymous Confession Wall - A safe space to speak your heart out anonymously." />
+  <title>Anonymous Confession Wall</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+
+<body>
+  <!-- Particle Background -->
+  <div id="particles-js"></div>
+  <canvas id="particle-bg"></canvas>
+
+  <!-- Navbar -->
+  <header>
+    <nav class="navbar">
+      <h1 style="color: #ff66cc;">🕵️‍♂️ Anonymous Confession Wall</h1>
+      <ul class="nav-links">
+        <li><a href="first.html">Home</a></li>
+        <li><a href="#">Confess</a></li>
+      </ul>
+      <!-- Dark Mode Toggle -->
+      <button id="darkModeToggle" title="Toggle dark mode">🌓</button>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    <h2 style="color: #00ffaa;">Confess Anonymously, Heal Silently</h2>
+
+    <!-- Confession Input -->
+    <div class="search-bar">
+      <input type="text" placeholder="Search confessions... (coming soon)">
+    </div>
+
+    <div class="floating-messages">
+      <span>You’re not alone 💙</span>
+      <span>No one is judging you</span>
+      <span>Speak your heart out</span>
+      <span>This is a safe space</span>
+    </div>
+
+    <div class="confession-box">
+      <textarea id="confessionInput" placeholder="Write your secret here..." rows="5"></textarea>
+      <button onclick="submitConfession()">Confess</button>
+      <button onclick="clearConfessions()">Clear All</button>
+    </div>
+
+    <!-- Motivational Messages -->
+    <section class="messages-box">
+      <p>🌱 You're not alone. Your words matter.</p>
+      <p>🧠 Mental peace begins with honesty.</p>
+      <p>💬 No one is judging. This is a safe space.</p>
+    </section>
+
+    <!-- Confessions Display -->
+    <div id="confessionsContainer"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Particle.js config
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 80 },
+        color: { value: "#ffffff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.1 },
+        size: { value: 3 },
+        move: { enable: true, speed: 0.6 }
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: true, mode: "repulse" }
+        }
+      }
+    });
+
+    // Lucide icons activation
+    window.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+    });
+
+    // Starfield canvas effect
+    const canvas = document.getElementById('particle-bg');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const stars = [];
+
+    for (let i = 0; i < 100; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5 + 0.5,
+        d: Math.random() * 0.5 + 0.2
+      });
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#888';
+      stars.forEach((s) => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function moveStars() {
+      stars.forEach((s) => {
+        s.y += s.d;
+        if (s.y > canvas.height) {
+          s.y = 0;
+          s.x = Math.random() * canvas.width;
+        }
+      });
+    }
+
+    function loop() {
+      drawStars();
+      moveStars();
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    // Dark mode toggle
+    const toggle = document.getElementById('darkModeToggle');
+    toggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+function submitConfession() {
+  const input = document.getElementById("confessionInput");
+  const confessionText = input.value.trim();
+  if (!confessionText) return;
+
+  // Get existing confessions or create new array
+  const stored = localStorage.getItem("confessions");
+  const confessions = stored ? JSON.parse(stored) : [];
+
+  // Add new confession with empty likes/comments
+  confessions.unshift({
+    text: confessionText,
+    likes: 0,
+    comments: []
+  });
+
+  // Save back to localStorage
+  localStorage.setItem("confessions", JSON.stringify(confessions));
+
+  // Show success message
+ // Show custom popup
+const popup = document.getElementById("thankYouPopup");
+popup.style.display = "block";
+
+// Redirect after 2 seconds
+setTimeout(() => {
+  popup.style.display = "none";
+  window.location.href = "first.html";
+}, 2000);
+
+
+  input.value = "";
+}
+
+
+    function likePost(button) {
+      const countSpan = button.querySelector(".like-count");
+      let count = parseInt(countSpan.textContent);
+      countSpan.textContent = ++count;
+    }
+
+    function toggleCommentBox(button) {
+      const commentBox = button.parentElement.nextElementSibling;
+      commentBox.style.display = commentBox.style.display === "block" ? "none" : "block";
+    }
+
+    function addComment(btn) {
+      const commentBox = btn.parentElement;
+      const textarea = commentBox.querySelector("textarea");
+      const commentText = textarea.value.trim();
+      if (!commentText) return;
+
+      const commentDiv = document.createElement("div");
+      commentDiv.className = "comment";
+      commentDiv.textContent = commentText;
+      commentBox.querySelector(".comments-list").appendChild(commentDiv);
+
+      const commentCount = btn.closest(".confession-card")
+        .querySelector(".comment-count");
+      commentCount.textContent = parseInt(commentCount.textContent) + 1;
+
+      textarea.value = "";
+    }
+
+    function clearConfessions() {
+      document.getElementById("confessionsContainer").innerHTML = "";
+    }
+  </script>
+  <!-- Custom Thank You Popup -->
+<div id="thankYouPopup" style="display:none;" class="popup">
+  <p>THANK YOU 😊</p>
+</div>
+
+</body>
+</html>
